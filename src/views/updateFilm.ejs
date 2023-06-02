@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Film</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="update-user-container">
+        <form action="/update-film" method="POST">
+            <div>
+                <label for="">Name film: </label>
+                <input name="nameFilm" value="<%= dataFilm.nameFilm %>">
+            </div>
+            <div>
+                <label for="">Author: </label>
+                <input name="author" value="<%= dataFilm.author %>">
+            </div>
+            <div>
+                <label for="">Cast: </label>
+                <input name="cast" value="<%= dataFilm.cast %>">
+            </div>
+            <div>
+                <label for="">Movie type: </label>
+                <input name="movieType" value="<%= dataFilm.movieType %>">
+            </div>
+            <div>
+                <label for="">Time: </label>
+                <input name="time" value="<%= dataFilm.time %>">
+            </div>
+            <div>
+                <label for="">Release date: </label>
+                <input name="releaseDate" value="<%= dataFilm.releaseDate %>" type="date">
+            </div>
+            <div>
+                <label for="">Image: </label>
+                <input name="image" value="<%= dataFilm.image %>">
+            </div>
+            <div>
+                <label for="">Number booking: </label>
+                <input name="numberBooking" value="<%= dataFilm.numberBooking %>">
+            </div>
+            <input type="text" value="<%= dataFilm.idFilm %>" hidden name="idFilm">
+            <div>
+                <button type="submit" class="btn-save">Save</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

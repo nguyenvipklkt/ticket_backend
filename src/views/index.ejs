@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="/upload">Upload file</a>
+    </div>
+
+    <div>
+        <div class="container">
+            <div>
+                <div style="padding-left:16px">
+                    <h2>List users table</h2>
+                </div>
+
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>FirstName</th>
+                            <th>LastName</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i=0; i < dataUser.length; i ++) { %>
+                            <tr>
+                                <td>
+                                    <%= dataUser[i].id %>
+                                </td>
+                                <td>
+                                    <%= dataUser[i].firstName %>
+                                </td>
+                                <td>
+                                    <%= dataUser[i].lastName %>
+                                </td>
+                                <td class="d-flex">
+                                    <button><a href="/detail/user/<%= dataUser[i].id %>"
+                                            target="_blank">Detail</a></button>
+                                    <form action="/edit-user/<%= dataUser[i].id %>" method="GET">
+                                        <button href="">Edit</button>
+                                    </form>
+                                    <form action="/delete-user" method="POST">
+                                        <input type="text" hidden value="<%= dataUser[i].id %>" name="userId">
+                                        <button href="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+                <div class="create-user-container">
+                    <form action="/create-new-user" method="POST">
+                        <div><b>Create a new user</b></div>
+                        <div>
+                            <label for="">First Name: </label>
+                            <input type="text" name="firstName">
+                        </div>
+                        <div>
+                            <label for="">Last Name: </label>
+                            <input type="text" name="lastName">
+                        </div>
+                        <div>
+                            <label for="">Email: </label>
+                            <input type="email" name="email">
+                        </div>
+                        <div>
+                            <label for="">Password: </label>
+                            <input type="password" name="password">
+                        </div>
+                        <div>
+                            <label for="">Address: </label>
+                            <input type="text" name="address">
+                        </div>
+                        <div>
+                            <button type="submit" class="btn-submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div>
+                <div style="padding-left:16px">
+                    <h2>List film table</h2>
+                </div>
+
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>IdFilm</th>
+                            <th>NameFilm</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i=0; i < dataFilm.length; i ++) { %>
+                            <tr>
+                                <td>
+                                    <%= dataFilm[i].idFilm %>
+                                </td>
+                                <td>
+                                    <%= dataFilm[i].nameFilm %>
+                                </td>
+                                <td class="d-flex">
+                                    <button><a href="/detail/film/<%= dataFilm[i].idFilm %>"
+                                            target="_blank">Detail</a></button>
+                                    <form action="/edit-film/<%= dataFilm[i].idFilm %>" method="GET">
+                                        <button href="">Edit</button>
+                                    </form>
+                                    <form action="/delete-film" method="POST">
+                                        <input type="text" hidden value="<%= dataFilm[i].idFilm %>" name="idFilm">
+                                        <button href="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+                <div class="create-user-container">
+                    <form action="/create-new-film" method="POST">
+                        <div><b>Create a new Film</b></div>
+                        <div>
+                            <label for="">nameFilm: </label>
+                            <input type="text" name="nameFilm">
+                        </div>
+                        <div>
+                            <label for="">Author: </label>
+                            <input type="text" name="author">
+                        </div>
+                        <div>
+                            <label for="">Cast: </label>
+                            <input type="text" name="cast">
+                        </div>
+                        <div>
+                            <label for="">MovieType: </label>
+                            <input type="number" name="movieType">
+                        </div>
+                        <div>
+                            <label for="">Time: </label>
+                            <input type="number" name="time">
+                        </div>
+                        <div>
+                            <label for="">ReleaseDate: </label>
+                            <input type="date" name="releaseDate">
+                        </div>
+                        <div>
+                            <label for="">Image: </label>
+                            <input type="number" name="image">
+                        </div>
+                        <div>
+                            <label for="">NumberBooking: </label>
+                            <input type="number" name="numberBooking">
+                        </div>
+                        <div>
+                            <button type="submit" class="btn-submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+
+</html>
