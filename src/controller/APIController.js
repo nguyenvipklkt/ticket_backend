@@ -1,3 +1,4 @@
+import { json } from "body-parser";
 import pool from "../configs/connectDB";
 
 let getAllUsers = async (req, res) => {
@@ -104,6 +105,33 @@ let deleteFilm = async (req, res) => {
     })
 }
 
+let loginUser = async (req, res) => {
+    const { email, passwordIn } = req.body;
+
+    try {
+        // Tìm người dùng trong cơ sở dữ liệu
+        // const allEmail = await pool.excute('select email from users', [allEmail]);
+        // if (emailIn == allEmail) {
+        const password = await pool.execute('select password from users where email = ?', [email]);
+        console.log(password);
+        const pass = JSON.stringify(password[0]).toString();
+
+        const checkPasswordIn = `[{"password":"${passwordIn}"}]`;
+        // Kiểm tra mật khẩu
+        if (pass == checkPasswordIn) {
+            res.status(200).json({ message: 'Đăng nhập thành công!' });
+        } else {
+            res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ!' });
+        }
+        // } else {
+        //     res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ!' });
+        // }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi!' });
+    }
+}
+
 module.exports = {
     getAllUsers,
     createNewUser,
@@ -112,5 +140,6 @@ module.exports = {
     getAllFilms,
     createNewFilm,
     updateFilm,
-    deleteFilm
+    deleteFilm,
+    loginUser
 }

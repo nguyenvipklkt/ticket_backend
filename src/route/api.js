@@ -12,6 +12,7 @@ const initAPIRoute = (app) => {
     router.post('/create-film', APIController.createNewFilm);
     router.put('/update-film', APIController.updateFilm);
     router.delete('/delete-film/:idFilm', APIController.deleteFilm);
+    router.post('/login', APIController.loginUser);
 
     return app.use('/api/v1/', router);
 
