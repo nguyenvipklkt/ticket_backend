@@ -14,15 +14,17 @@ let createNewUser = async (req, res) => {
     let { firstName, lastName, email, password, address } = req.body;
 
     if (!firstName || !lastName || !email || !password || !address) {
-        return res.status(200).json({
-            message: 'missing required params'
+        return res.status(422).json({
+            message: 'missing required params',
+            result: false
         })
     }
 
     await pool.execute('insert into users(firstName, lastName, email, password, address) values (?, ?, ?, ?, ?) ', [firstName, lastName, email, password, address]);
 
     return res.status(200).json({
-        message: 'ok'
+        message: 'ok',
+        result: true
     })
 }
 
@@ -119,9 +121,9 @@ let loginUser = async (req, res) => {
         const checkPasswordIn = `[{"password":"${passwordIn}"}]`;
         // Kiểm tra mật khẩu
         if (pass == checkPasswordIn) {
-            res.status(200).json({ message: 'Đăng nhập thành công!' });
+            res.status(200).json({ message: 'Đăng nhập thành công!', result: true });
         } else {
-            res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ!' });
+            res.status(422).json({ message: 'Thông tin đăng nhập không hợp lệ!', result: false });
         }
         // } else {
         //     res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ!' });

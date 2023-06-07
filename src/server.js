@@ -2,6 +2,7 @@ import express from 'express';
 import configViewEngine from './configs/viewEngine';
 import initWebRoute from './route/web';
 import initAPIRoute from './route/api'
+import cors from 'cors';
 // import connection from './configs/connectDB';
 
 require('dotenv').config();
@@ -13,6 +14,23 @@ const port = process.env.PORT || 3000;
 app.use(morgan('combined'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+const corsOpts = {
+    origin: '*',
+
+    methods: [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+        'PATCH'
+    ],
+
+    allowedHeaders: [
+        'Content-Type',
+    ],
+};
+
+app.use(cors(corsOpts));
 //set up view engine
 configViewEngine(app);
 
