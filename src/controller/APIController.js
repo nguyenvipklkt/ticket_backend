@@ -6,7 +6,8 @@ let getAllUsers = async (req, res) => {
 
     return res.status(200).json({
         message: 'ok',
-        data: rows
+        data: rows,
+        result: true,
     })
 }
 
@@ -64,7 +65,7 @@ let getAllFilms = async (req, res) => {
     const [rows, fields] = await pool.execute('SELECT * FROM `films`');
     return res.status(200).json({
         message: 'ok',
-        data: rows
+        dataFilm: rows
     })
 }
 
@@ -115,15 +116,29 @@ let loginUser = async (req, res) => {
         // const allEmail = await pool.excute('select email from users', [allEmail]);
         // if (emailIn == allEmail) {
         const password = await pool.execute('select password from users where email = ?', [email]);
+        const [row, field] = await pool.execute('select * from users where email = ?', [email]);
         console.log(password);
+        // console.log(id);
+        // console.log(firstName);
         const pass = JSON.stringify(password[0]).toString();
 
         const checkPasswordIn = `[{"password":"${passwordIn}"}]`;
         // Kiểm tra mật khẩu
         if (pass == checkPasswordIn) {
-            res.status(200).json({ message: 'Đăng nhập thành công!', result: true });
+            var user = {
+                id: row[0].id,
+                firstName: row[0].firstName,
+                email: row[0].email,
+                lastName: row[0].lastName,
+                address: row[0].address,
+            };
+            res.status(200).json({
+                message: 'Đăng nhập thành công!',
+                user: user,
+                result: true
+            });
         } else {
-            res.status(422).json({ message: 'Thông tin đăng nhập không hợp lệ!', result: false });
+            res.status(422).json({ message: 'Thông tin đăng nhập không hợp lệ!', user: null, result: false });
         }
         // } else {
         //     res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ!' });
