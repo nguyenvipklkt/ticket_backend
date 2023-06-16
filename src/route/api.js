@@ -21,6 +21,7 @@ const initAPIRoute = (app) => {
     router.post('/create-schedule', APIController.createNewSchedule);
     router.put('/update-schedule', APIController.updateSchedule);
     router.delete('/delete-schedule/:idSC', APIController.deleteSchedule);
+    router.post('/getShowDateAndIdCinema', APIController.getShowDate);
 
 
     return app.use('/api/v1/', router);

@@ -251,6 +251,26 @@ let deleteSchedule = async (req, res) => {
     })
 }
 
+let getShowDate = async (req, res) => {
+    let { idFilm } = req.body;
+    if (!idFilm) {
+        return res.status(200).json({
+            message: 'missing required params'
+        })
+    }
+    const [rows, fields] = await pool.execute('SELECT showDate FROM schedules WHERE idFilm = ?', [idFilm]);
+    const [row, field] = await pool.execute('SELECT idCinema FROM schedules WHERE idFilm = ?', [idFilm]);
+    const [row1, field1] = await pool.execute('SELECT idSC FROM schedules WHERE idFilm = ?', [idFilm]);
+    return res.status(200).json({
+        message: 'ok',
+        dataShowDate: rows,
+        dataIdCinema: row,
+        dataIdSC: row1
+    })
+
+}
+
+
 module.exports = {
     getAllUsers,
     createNewUser,
@@ -268,5 +288,6 @@ module.exports = {
     getAllSchedules,
     createNewSchedule,
     updateSchedule,
-    deleteSchedule
+    deleteSchedule,
+    getShowDate
 }
