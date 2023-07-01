@@ -11,6 +11,15 @@ let getAllUsers = async (req, res) => {
     })
 }
 
+let getUser = async (req, res) => {
+    let id = req.params.id;
+    const user = await pool.execute('select * from users where id = ?', [id]);
+    return res.status(200).json({
+        message: 'ok',
+        user: user[0],
+    })
+}
+
 let createNewUser = async (req, res) => {
     let { firstName, lastName, email, password, address } = req.body;
 
@@ -30,15 +39,16 @@ let createNewUser = async (req, res) => {
 }
 
 let updateUser = async (req, res) => {
-    let { firstName, lastName, email, password, address, id } = req.body;
+    let id = req.params.id;
+    let { firstName, lastName, email, address } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !address || !id) {
+    if (!firstName || !lastName || !email || !address) {
         return res.status(200).json({
             message: 'missing required params'
         })
     }
 
-    await pool.execute('update users set firstName = ?, lastName = ?, email = ?, password = ?, address = ? where id = ?', [firstName, lastName, email, password, address, id]);
+    await pool.execute('update users set firstName = ?, lastName = ?, email = ?, address = ? where id = ?', [firstName, lastName, email, address, id]);
 
     return res.status(200).json({
         message: 'ok'
@@ -69,22 +79,34 @@ let getAllFilms = async (req, res) => {
     })
 }
 
+let getFilm = async (req, res) => {
+    let idFilm = req.params.idFilm;
+    const film = await pool.execute('select * from films where idFilm = ?', [idFilm]);
+    return res.status(200).json({
+        message: 'ok',
+        film: film[0],
+    })
+}
+
 let createNewFilm = async (req, res) => {
     let { nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking } = req.body;
     if (!nameFilm || !author || !cast || !movieType || !time || !releaseDate || !image || !numberBooking) {
         return res.status(200).json({
-            message: 'missing required params'
+            message: 'missing required params',
+            result: false
         })
     }
     await pool.execute('insert into films(nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking) values (?, ?, ?, ?, ?, ?, ?, ?)', [nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking]);
     return res.status(200).json({
-        message: 'ok'
+        message: 'ok',
+        result: true
     })
 }
 
 let updateFilm = async (req, res) => {
-    let { nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking, idFilm } = req.body;
-    if (!nameFilm || !author || !cast || !movieType || !time || !releaseDate || !image || !numberBooking || !idFilm) {
+    let idFilm = req.params.idFilm;
+    let { nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking } = req.body;
+    if (!nameFilm || !author || !cast || !movieType || !time || !releaseDate || !image || !numberBooking) {
         return res.status(200).json({
             message: 'missing required params'
         })
@@ -163,17 +185,20 @@ let createNewCinema = async (req, res) => {
     let { showRoom, logo } = req.body;
     if (!showRoom || !logo) {
         return res.status(200).json({
-            message: 'missing required params'
+            message: 'missing required params',
+            result: false
         })
     }
     await pool.execute('insert into cinemas(showRoom, logo) values (?, ?)', [showRoom, logo]);
     return res.status(200).json({
-        message: 'ok'
+        message: 'ok',
+        result: true
     })
 }
 
 let updateCinema = async (req, res) => {
-    let { showRoom, logo, idCinema } = req.body;
+    let idCinema = req.params.idCinema;
+    let { showRoom, logo } = req.body;
     if (!showRoom || !logo || !idCinema) {
         return res.status(200).json({
             message: 'missing required params'
@@ -208,23 +233,57 @@ let getAllSchedules = async (req, res) => {
     })
 }
 
+let getSchedule = async (req, res) => {
+    const { idFilm, idCinema } = req.params;
+
+    // Lấy ngày hiện tại
+    const currentDate = new Date();
+    // const formattedCurrentDate = currentDate.toISOString().split('T')[0];
+
+    console.log(currentDate);
+
+    if (!idFilm || !idCinema) {
+        return res.status(200).json({
+            message: 'missing required params'
+        })
+    }
+
+    const [rows, fields] = await pool.execute('select * from schedules where idFilm = ? and idCinema = ?', [idFilm, idCinema]);
+
+    const filteredSchedules = rows.filter(schedule => {
+        // const scheduleDate = schedule.showDate.split(' ')[0];
+        const scheduleDate = schedule.showDate;
+        if (scheduleDate >= currentDate) {
+            // return [scheduleDate, schedule.idSC]
+            return scheduleDate;
+        }
+    });
+    res.status(200).json({
+        message: 'ok',
+        data: filteredSchedules,
+    });
+}
+
 let createNewSchedule = async (req, res) => {
     let { idFilm, idCinema, showDate } = req.body;
     if (!idFilm || !idCinema || !showDate) {
         return res.status(200).json({
-            message: 'missing required params'
+            message: 'missing required params',
+            result: false
         })
     }
 
     await pool.execute('insert into schedules(idFilm, idCinema, showDate) values (?, ?, ?)', [idFilm, idCinema, showDate]);
     return res.status(200).json({
         message: 'ok',
+        result: true
     })
 
 }
 
 let updateSchedule = async (req, res) => {
-    let { idFilm, idCinema, showDate, idSC } = req.body;
+    let idSC = req.params.idSC;
+    let { idFilm, idCinema, showDate } = req.body;
 
     if (!idSC || !idFilm || !idCinema || !showDate) {
         return res.status(200).json({
@@ -270,13 +329,114 @@ let getShowDate = async (req, res) => {
 
 }
 
+let getAllTickets = async (req, res) => {
+    const [rows, fields] = await pool.execute('SELECT * FROM `ticket`');
+
+    return res.status(200).json({
+        message: 'ok',
+        dataTickets: rows,
+        result: true,
+    })
+}
+
+let getTicket = async (req, res) => {
+    let idTicket = req.params.idTicket;
+    const ticket = await pool.execute('select * from ticket where idTicket = ?', [idTicket]);
+    return res.status(200).json({
+        message: 'ok',
+        ticket: ticket[0],
+    })
+}
+
+let getSeats = async (req, res) => {
+    let idSC = req.params.idSC;
+    const seats = await pool.execute('select seats from ticket where idSC = ?', [idSC]);
+    return res.status(200).json({
+        message: 'ok',
+        seats: seats[0],
+    })
+}
+
+let createNewTicket = async (req, res) => {
+    let { idSC, idUser, cost, seats, pay, tkStatus } = req.body;
+    const bookingDate = new Date().toISOString().split('T')[0];
+
+    await pool.execute('insert into ticket(idSC, idUser, cost, seats, bookingDate, pay, tkStatus) values (?, ?, ?, ?, ?, ?, ?)', [idSC, idUser, cost, seats, bookingDate, pay, tkStatus]);
+    return res.status(200).json({
+        message: 'ok',
+        result: true
+    })
+}
+
+
+let updateTicket = async (req, res) => {
+    let idTicket = req.params.idTicket;
+    let { idSC, idUser, cost, seats, bookingDate, pay, tkStatus } = req.body;
+
+    if (!idSC || !idUser || !cost || !seats || !bookingDate || !pay || !tkStatus) {
+        return res.status(200).json({
+            message: 'missing required params'
+        })
+    }
+
+    await pool.execute('update ticket set idSC = ?, idUser = ?, cost = ?, seats = ?, bookingDate = ?, pay = ?, tkStatus = ? where idTicket = ?', [idSC, idUser, cost, seats, bookingDate, pay, tkStatus, idTicket]);
+    return res.status(200).json({
+        message: 'ok'
+    })
+}
+
+let deleteTicket = async (req, res) => {
+    let idTicket = req.params.idTicket;
+    if (!idTicket) {
+        return res.status(200).json({
+            message: 'missing required params'
+        })
+    }
+    await pool.execute('delete from ticket where idTicket = ?', [idTicket]);
+    return res.status(200).json({
+        message: 'ok'
+    })
+}
+
+let getTkByUser = async (req, res) => {
+    let idUser = req.params.idUser;
+    if (!idUser) {
+        return res.status(200).json({
+            message: 'missing required params',
+            result: false
+        })
+    }
+    const tk = await pool.execute('select t.*, s.*, f.* from ticket t join schedules s on t.idSC = s.idSC join films f on s.idFilm = f.idFilm where t.idUser = ?', [idUser]);
+
+    return res.status(200).json({
+        message: 'ok',
+        result: true,
+        dataTicket: tk[0]
+    })
+}
+
+let updateTkStatus = async (req, res) => {
+    const currentDate = new Date();
+    const [rows, fields] = await pool.execute('select t.*, s.* from ticket t join schedules s on t.idSC = s.idSC');
+    let tkStatus = 1;
+    rows.map(async (row) => {
+        if (row.showDate <= currentDate) {
+            await pool.execute('update ticket set tkStatus = ? where idTicket = ?', [tkStatus, row.idTicket]);
+        }
+    })
+    return res.status(200).json({
+        message: 'ok',
+    })
+}
 
 module.exports = {
     getAllUsers,
+    getUser,
     createNewUser,
     updateUser,
     deleteUser,
     getAllFilms,
+    getFilm,
     createNewFilm,
     updateFilm,
     deleteFilm,
@@ -286,8 +446,17 @@ module.exports = {
     updateCinema,
     deleteCinema,
     getAllSchedules,
+    getSchedule,
     createNewSchedule,
     updateSchedule,
     deleteSchedule,
-    getShowDate
+    getShowDate,
+    getAllTickets,
+    getTicket,
+    createNewTicket,
+    updateTicket,
+    deleteTicket,
+    getSeats,
+    getTkByUser,
+    updateTkStatus
 }
