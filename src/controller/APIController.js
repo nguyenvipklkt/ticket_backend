@@ -105,13 +105,13 @@ let createNewFilm = async (req, res) => {
 
 let updateFilm = async (req, res) => {
     let idFilm = req.params.idFilm;
-    let { nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking } = req.body;
-    if (!nameFilm || !author || !cast || !movieType || !time || !releaseDate || !image || !numberBooking) {
+    let { nameFilm, author, cast, movieType, time, releaseDate, image } = req.body;
+    if (!nameFilm || !author || !cast || !movieType || !time || !releaseDate || !image) {
         return res.status(200).json({
             message: 'missing required params'
         })
     }
-    await pool.execute('update films set nameFilm = ?, author = ?, cast = ?, movieType = ?, time = ?, releaseDate = ?, image = ?, numberBooking = ? where idFilm = ?', [nameFilm, author, cast, movieType, time, releaseDate, image, numberBooking, idFilm]);
+    await pool.execute('update films set nameFilm = ?, author = ?, cast = ?, movieType = ?, time = ?, releaseDate = ?, image = ? where idFilm = ?', [nameFilm, author, cast, movieType, time, releaseDate, image, idFilm]);
     return res.status(200).json({
         message: 'ok'
     })
@@ -237,10 +237,9 @@ let getSchedule = async (req, res) => {
     const { idFilm, idCinema } = req.params;
 
     // Lấy ngày hiện tại
-    const currentDate = new Date();
-    // const formattedCurrentDate = currentDate.toISOString().split('T')[0];
+    // const currentDate = new Date();
 
-    console.log(currentDate);
+    // console.log(currentDate);
 
     if (!idFilm || !idCinema) {
         return res.status(200).json({
@@ -253,7 +252,7 @@ let getSchedule = async (req, res) => {
     const filteredSchedules = rows.filter(schedule => {
         // const scheduleDate = schedule.showDate.split(' ')[0];
         const scheduleDate = schedule.showDate;
-        if (scheduleDate >= currentDate) {
+        if (schedule.statusSC == 0) {
             // return [scheduleDate, schedule.idSC]
             return scheduleDate;
         }
@@ -330,7 +329,7 @@ let getShowDate = async (req, res) => {
 }
 
 let getAllTickets = async (req, res) => {
-    const [rows, fields] = await pool.execute('SELECT * FROM `ticket`');
+    const [rows, fields] = await pool.execute('select t.*, u.* from ticket t join users u on t.idUser = u.id');
 
     return res.status(200).json({
         message: 'ok',
@@ -429,6 +428,57 @@ let updateTkStatus = async (req, res) => {
     })
 }
 
+let updateStatusSchedule = async (req, res) => {
+    const currentDate = new Date();
+    const [rows, fields] = await pool.execute('SELECT * FROm `schedules`');
+    let statusSC = 1;
+    rows.map(async (row) => {
+        if (row.showDate <= currentDate) {
+            await pool.execute('update schedules set statusSC = ? where idSC = ?', [statusSC, row.idSC]);
+        }
+    })
+    return res.status(200).json({
+        message: 'ok',
+    })
+
+}
+
+let handleUploadFileFilm = (req, res) => {
+    if (req.fileValidationError) {
+        return res.status(200).json(req.fileValidationError);
+    }
+    else if (!req.file) {
+        return res.status(200).json({
+            message: 'Please select an image to upload'
+        });
+    }
+
+    else {
+        return res.status(200).json({
+            message: 'ok',
+            fileUrl: `http://localhost:4000/image/${req.file.filename}`
+        })
+    }
+}
+
+let handleUploadFileCinema = (req, res) => {
+    if (req.fileValidationError) {
+        return res.status(200).json(req.fileValidationError);
+    }
+    else if (!req.file) {
+        return res.status(200).json({
+            message: 'Please select an image to upload'
+        });
+    }
+
+    else {
+        return res.status(200).json({
+            message: 'ok',
+            fileUrl: `http://localhost:4000/image/logo-cinemas/${req.file.filename}`
+        })
+    }
+}
+
 module.exports = {
     getAllUsers,
     getUser,
@@ -458,5 +508,8 @@ module.exports = {
     deleteTicket,
     getSeats,
     getTkByUser,
-    updateTkStatus
+    updateTkStatus,
+    updateStatusSchedule,
+    handleUploadFileFilm,
+    handleUploadFileCinema
 }
