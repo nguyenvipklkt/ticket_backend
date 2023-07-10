@@ -87,6 +87,9 @@ const initAPIRoute = (app) => {
     router.get('/updateStatusSchedule', APIController.updateStatusSchedule);
     router.post('/upload-film', upload.single('image'), APIController.handleUploadFileFilm);
     router.post('/upload-cinema', uploadCinema.single('logo'), APIController.handleUploadFileCinema);
+    router.get('/searchFilm/:name', APIController.searchFilm);
+    router.get('/films/now-showing', APIController.nowFilm);
+    router.get('/films/future-showing', APIController.futureFilm);
 
     return app.use('/api/v1/', router);
 

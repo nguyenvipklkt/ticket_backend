@@ -479,6 +479,63 @@ let handleUploadFileCinema = (req, res) => {
     }
 }
 
+let searchFilm = async (req, res) => {
+    const name = req.params.name;
+
+    const [rows, fields] = await pool.execute('select * from films');
+
+    if (name == '') {
+        return res.status(200).json({
+            message: 'name is empty'
+        })
+    }
+    else {
+        const films = rows.filter((film) =>
+            film.nameFilm.toLowerCase().includes(name.toLowerCase())
+        );
+
+        if (films.length == 0) {
+            return res.status(200).json({
+                message: 'name is empty'
+            })
+        }
+        else {
+            return res.status(200).json({
+                message: 'ok',
+                films: films
+            })
+        }
+    }
+}
+
+let nowFilm = async (req, res) => {
+    // Lấy ngày đầu tuần (thứ 2)
+    const today = new Date();
+    const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+
+    // Lấy ngày cuối tuần (Chủ nhật)
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+
+    // Truy vấn danh sách phim đang khởi chiếu trong tuần
+    const [rows, fields] = await pool.execute(`SELECT * FROM films WHERE releaseDate BETWEEN ? AND ?`, [firstDayOfWeek, lastDayOfWeek]);
+
+    return res.status(200).json({
+        message: 'ok',
+        films: rows
+    })
+
+}
+
+let futureFilm = async (req, res) => {
+    const today = new Date();
+    const [rows, fields] = await pool.execute('select * from films where releaseDate > ?', [today]);
+    return res.status(200).json({
+        message: 'ok',
+        films: rows
+    })
+}
+
 module.exports = {
     getAllUsers,
     getUser,
@@ -511,5 +568,8 @@ module.exports = {
     updateTkStatus,
     updateStatusSchedule,
     handleUploadFileFilm,
-    handleUploadFileCinema
+    handleUploadFileCinema,
+    searchFilm,
+    nowFilm,
+    futureFilm
 }
