@@ -536,6 +536,20 @@ let futureFilm = async (req, res) => {
     })
 }
 
+let sumTicket = async (req, res) => {
+    const [rows, fields] = await pool.execute('select * from ticket');
+    // console.log(rows);
+    const totalSales = rows.reduce((total, ticket) => total + ticket.cost, 0);
+    // console.log(totalSales);
+    const totalTicketsSold = rows.length;
+    // console.log(totalTicketsSold);
+    return res.status(200).json({
+        message: 'ok',
+        totalSales: totalSales,
+        totalTicketsSold: totalTicketsSold
+    })
+}
+
 module.exports = {
     getAllUsers,
     getUser,
@@ -571,5 +585,6 @@ module.exports = {
     handleUploadFileCinema,
     searchFilm,
     nowFilm,
-    futureFilm
+    futureFilm,
+    sumTicket
 }

@@ -90,6 +90,7 @@ const initAPIRoute = (app) => {
     router.get('/searchFilm/:name', APIController.searchFilm);
     router.get('/films/now-showing', APIController.nowFilm);
     router.get('/films/future-showing', APIController.futureFilm);
+    router.get('/sumTicket', APIController.sumTicket);
 
     return app.use('/api/v1/', router);
 
